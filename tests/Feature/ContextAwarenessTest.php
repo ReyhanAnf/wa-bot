@@ -45,11 +45,11 @@ class ContextAwarenessTest extends TestCase
                 ->andReturn('Hello, Johnny!'); // Simulated response
         });
 
-        // 3. Hit Webhook
+        // 3. Hit Webhook with /ai command
         $response = $this->postJson('/api/webhook/handle', [
             'payload' => [
                 'from' => '628123456789',
-                'body' => 'Who am I?',
+                'body' => '/ai Who am I?',
             ]
         ]);
 
@@ -80,7 +80,7 @@ class ContextAwarenessTest extends TestCase
         $this->postJson('/api/webhook/handle', [
             'payload' => [
                 'chatId' => '628999888@c.us',
-                'body' => 'Test',
+                'body' => '/ai Test',
             ]
         ]);
 
@@ -200,7 +200,7 @@ class ContextAwarenessTest extends TestCase
         $this->postJson('/api/webhook/handle', [
             'payload' => [
                 'from' => '628123',
-                'body' => 'Something else',
+                'body' => '/ai Something else',
             ]
         ]);
     }

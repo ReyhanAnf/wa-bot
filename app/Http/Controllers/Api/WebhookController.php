@@ -123,25 +123,8 @@ class WebhookController extends Controller
             return response()->json(['status' => 'success', 'handler' => 'keyword']);
         }
 
-        // 6. AI Fallback
-        $systemPrompt = SystemSetting::where('key', 'bot_persona')->value('value') ?? 'You are a helpful assistant.';
-        $history = Chat::where('wa_number', $waNumber)
-            ->whereIn('source', ['user', 'bot_ai']) // Only include User and AI chats, exclude Command outputs
-            ->orderBy('created_at', 'desc')
-            ->take(5)
-            ->get()
-            ->reverse()
-            ->map(fn($c) => ['role' => $c->source === 'user' ? 'user' : 'model', 'content' => $c->message])
-            ->toArray();
-
-        // Context Awareness: Resolve Contact
-        $contact = \App\Models\Contact::where('wa_number', $waNumber)->first();
-
-        // Inject Contact into AI Service
-        $aiResponse = $this->aiService->getAnswer($systemPrompt, $history, $messageBody, $contact);
-        $this->sendResponse($rawId, $waNumber, $aiResponse, 'bot_ai');
-
-        return response()->json(['status' => 'success', 'handler' => 'ai']);
+        // 6. No Match - Ignore
+        return response()->json(['status' => 'ignored', 'reason' => 'no_match']);
     }
 
     protected function handleTaskState(string $waNumber, string $message, string $chatId): bool

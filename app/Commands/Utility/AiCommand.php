@@ -27,8 +27,9 @@ class AiCommand implements CommandInterface
         // Get System Prompt
         $systemPrompt = SystemSetting::where('key', 'bot_persona')->value('value') ?? 'You are a helpful assistant.';
 
-        // Get Context (last 5 messages)
+        // Get Context (last 5 messages, exclude command outputs)
         $history = Chat::where('wa_number', $waNumber)
+            ->whereIn('source', ['user', 'bot_ai']) // Exclude bot_rule
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
@@ -41,7 +42,10 @@ class AiCommand implements CommandInterface
             })
             ->toArray();
 
-        $response = $this->aiService->getAnswer($systemPrompt, $history, $prompt);
+        // Context Awareness: Resolve Contact
+        $contact = \App\Models\Contact::where('wa_number', $waNumber)->first();
+
+        $response = $this->aiService->getAnswer($systemPrompt, $history, $prompt, $contact);
         return ['message' => $response, 'source' => 'bot_ai'];
     }
 }
