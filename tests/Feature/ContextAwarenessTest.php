@@ -165,5 +165,43 @@ class ContextAwarenessTest extends TestCase
             'wa_number' => '628555444', // Normalized Alt ID
             'source' => 'user',
         ]);
+            $this->assertDatabaseHas('chats', [
+            'wa_number' => '628555444', // Normalized Alt ID
+            'source' => 'user',
+        ]);
+    }
+
+    public function test_ai_history_excludes_command_outputs()
+    {
+        // Setup: Create chat history
+        // 1. User asks for schedule
+        Chat::create(['wa_number' => '628123', 'message' => '/jadwal', 'source' => 'user']);
+        // 2. Bot replies with schedule (Rule) -> SHOULD BE EXCLUDED
+        Chat::create(['wa_number' => '628123', 'message' => 'Jadwal Senin...', 'source' => 'bot_rule']);
+        // 3. User asks AI
+        // This is the current message, so it's not in DB yet during fetch (or logic handles it)
+
+        // Mock AI Service to inspect history
+        $this->mock(AiService::class, function ($mock) {
+            $mock->shouldReceive('getAnswer')
+                ->once()
+                ->withArgs(function ($prompt, $history, $message, $contact) {
+                    // History should NOT contain 'Jadwal Senin...'
+                    foreach ($history as $chat) {
+                        if (str_contains($chat['content'], 'Jadwal Senin')) {
+                            return false;
+                        }
+                    }
+                    return true;
+                })
+                ->andReturn('AI Response');
+        });
+
+        $this->postJson('/api/webhook/handle', [
+            'payload' => [
+                'from' => '628123',
+                'body' => 'Something else',
+            ]
+        ]);
     }
 }

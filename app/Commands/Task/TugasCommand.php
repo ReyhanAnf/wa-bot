@@ -147,11 +147,20 @@ class TugasCommand implements CommandInterface
     protected function help(): array
     {
         return ['message' => "🛠️ *Bantuan Tugas*\n\n" .
-               "📌 `/tugas list` - Lihat daftar tugas\n" .
-               "➕ `/tugas tambah [Judul] | [YYYY-MM-DD] | [priority]` - Tambah tugas\n" .
-               "🔍 `/tugas detail [ID]` - Lihat detail\n" .
-               "✅ `/tugas selesai [ID]` - Tandai selesai\n" .
-               "🗑️ `/tugas hapus [ID]` - Hapus tugas\n" .
-               "📝 `/tugas simpan` - Mode catat cepat", 'source' => 'bot_rule'];
+               "Halo! Berikut cara mengatur tugasmu:\n\n" .
+               "1️⃣ *Lihat Tugas:*\n" .
+               "   `/tugas list`\n\n" .
+               "2️⃣ *Tambah Tugas Baru:*\n" .
+               "   Format: `/tugas tambah [Judul] | [Tanggal] | [Prioritas]`\n" .
+               "   Contoh: `/tugas tambah Belajar Laravel | 2026-02-20 | high`\n" .
+               "   _(Prioritas: high, medium, low)_\n\n" .
+               "3️⃣ *Lihat Detail:*\n" .
+               "   `/tugas detail [ID]`\n\n" .
+               "4️⃣ *Tandai Selesai:*\n" .
+               "   `/tugas selesai [ID]`\n\n" .
+               "5️⃣ *Hapus Tugas:*\n" .
+               "   `/tugas hapus [ID]`\n\n" .
+               "📝 *Catat Cepat Mode Interaktif:*\n" .
+               "   `/tugas simpan`", 'source' => 'bot_rule'];
     }
 }

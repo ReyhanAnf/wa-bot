@@ -126,6 +126,7 @@ class WebhookController extends Controller
         // 6. AI Fallback
         $systemPrompt = SystemSetting::where('key', 'bot_persona')->value('value') ?? 'You are a helpful assistant.';
         $history = Chat::where('wa_number', $waNumber)
+            ->whereIn('source', ['user', 'bot_ai']) // Only include User and AI chats, exclude Command outputs
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get()
